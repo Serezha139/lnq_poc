@@ -1,0 +1,1 @@
+"https://www.artbasel.com/events/browse?eventTypes=-7,151,251,1,52",artbasel,"//a[contains(@href, '/events/detail')]",,"//div[@data-testid='mch-container' and contains(@class, 'site-content')]"
