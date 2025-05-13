@@ -1,4 +1,5 @@
 import csv
+import os
 
 from event.dto import EventDTO
 
@@ -10,22 +11,43 @@ class EventCSVRepo:
     def __init__(self, file_path):
         self.file_path = file_path
 
-    def save(self, dto: EventDTO):
-        # Save the DTO to the CSV file. If exists then rewrite it
-        with open(self.file_path, mode='r') as file:
-            reader = csv.reader(file)
-            rows = [row for row in reader]
-            for row in rows:
-                if row[0] == dto.original_uri:
-                    # If the event already exists, update it
-                    row[1] = dto.title
-                    row[2] = dto.description
-                    break
 
-        with open(self.file_path, mode='w', newline='') as file:
-            writer = csv.writer(file)
-            for row in rows:
-                writer.writerow(row)
-            # Write the new event if it doesn't exist
-            if not any(row[0] == dto.original_uri for row in rows):
-                writer.writerow([dto.original_uri, dto.title, dto.description, dto.start_date])
+    def save(self, dto: EventDTO):
+        # Define the field names (headers)
+        field_names = [
+            "original_uri", "title", "description", "start_date", "end_date", "dates",
+            "allDay", "timeFrom", "timeTill", "city", "country", "address",
+            "google_maps_uri", "cover", "thumb", "link", "original_site"
+        ]
+
+        # Check if the file exists and is not empty
+        file_exists = os.path.exists(self.file_path) and os.path.getsize(self.file_path) > 0
+
+        with open(self.file_path, mode='a', newline='', encoding='utf-8') as file:
+            writer = csv.DictWriter(file, fieldnames=field_names)
+
+            # Write headers if the file is empty
+            if not file_exists:
+                writer.writeheader()
+
+            # Write the DTO data as a row
+            writer.writerow({
+                "original_uri": dto.original_uri,
+                "title": dto.title,
+                "description": dto.description,
+                "start_date": dto.start_date,
+                "end_date": dto.end_date,
+                "dates": dto.dates,
+                "allDay": dto.allDay,
+                "timeFrom": dto.timeFrom,
+                "timeTill": dto.timeTill,
+                "city": dto.city,
+                "country": dto.country,
+                "address": dto.address,
+                "google_maps_uri": dto.google_maps_uri,
+                "cover": dto.cover,
+                "thumb": dto.thumb,
+                "link": dto.link,
+                "original_site": dto.original_site,
+            })
+

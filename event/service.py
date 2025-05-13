@@ -2,33 +2,38 @@ from event.dto import EventDTO
 from event.repo import EventCSVRepo
 from ai_crawler.settings import EVENT_CSV_REPO_FILE, EVENT_TXT_REPO_FILE
 
+
+def safe_extract_text(element, xpath):
+    """
+    Safely extract text from an element using XPath.
+    """
+    try:
+        return element.xpath(xpath)[0].get('text', None) if element.xpath(xpath) else None
+    except Exception as e:
+        print(f"Error extracting text with XPath '{xpath}': {e}")
+        return None
+
+
 class EventService:
     def __init__(self, event_repository):
         self.event_repository = event_repository
 
-    def get_event_by_uri(self, original_uri):
-        return self.event_repository.get_event_by_id(original_uri)
+    def create_event(self, title, description, link, city, country, address,
+                     google_maps_uri, start_date, end_date, cover):
+        # Create a new event
+        event = EventDTO(
+            title=title,
+            description=description,
+            link=link,
+            city=city,
+            country=country,
+            address=address,
+            google_maps_uri=google_maps_uri,
+            start_date=start_date,
+            end_date=end_date,
+            cover=cover
+        )
+        self.event_repository.save(event)
 
-    def create_event(self, event_data):
-        return self.event_repository.create_event(event_data)
-
-    def update_event(self, original_uri, event_data):
-        return self.event_repository.update_event(original_uri, event_data)
-
-    def delete_event(self, original_uri):
-        return self.event_repository.delete_event(original_uri)
-
-    def save(self, event_data: dict):
-        # Save the DTO to the text file
-        with open(EVENT_TXT_REPO_FILE, mode='a', newline='') as file:
-            file.write(f"{event_data['original_uri']}\n")
-
-        '''
-        dto = EventDTO()
-        dto.original_uri = event_data.get("original_uri")
-        dto.title = event_data.get("title")
-        dto.description = event_data.get("description")
-        self.event_repository.save(dto)
-        '''
 
 event_service = EventService(event_repository=EventCSVRepo(EVENT_CSV_REPO_FILE))  # Replace with actual repository instance

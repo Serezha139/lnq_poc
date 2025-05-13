@@ -5,9 +5,10 @@ class OpenAIService:
     def __init__(self, api_key: str):
         self.client = openai.OpenAI(api_key=api_key)
 
-    def get_event_list_xpath_expression(self, content: str) -> str:
+    def get_event_list_re_expression(self, content: str) -> str:
         promt = f"""
-        Give me the xpath expression which selects all the links of all of the event details on the page. The answer should be an xpath expression without any additional text: {content}
+        You are given a list of links
+        Give me the regular expression which filter the links to find only links to individual events on the page. The answer should be regular expression without any additional text: {content}
         """
         answer = self.client.responses.create(
             model="gpt-4.1-nano",
@@ -22,16 +23,17 @@ class OpenAIService:
         )
         return answer.output_text.strip()
 
-    def get_event_info(self, html_content: str) -> str:
+    def get_event_xpath_expressions(self, content: str, param_name:str) -> str:
         prompt = f"""
-        Extract the following fields from the provided HTML container. If a field is not present, return null. 
-        The fields are: 
-        original_site, original_uri, _id, cover, thumb, title, description, link, city, country, address, lat, lng, google_maps_uri, start_date, end_date, dates, allDay, timeFrom, timeTill.
-        Return the result as a JSON object without any additional text or symbols.
+You are an expert in HTML parsing and data extraction.
+Given the HTML element  that contains info about single event:
 
-        HTML content:
-        {html_content}
-        """
+{content}
+    
+give me the xpath expression, which would work for any analogue html element, that selects the {param_name} field.
+Do not base it on the text content of the element, but rather on the structure of the HTML.
+The answer should not contain additional text or symbols, just the xpath expression.
+"""
         answer = self.client.responses.create(
             model="gpt-4.1-nano",
             input=prompt,
