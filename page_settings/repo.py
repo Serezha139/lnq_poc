@@ -9,10 +9,6 @@ class PageSettingsRepository:
         self.file_path = file_path
         self.headers = [
             "page_url", "page_name", "event_list_re", "event_container_xpath",
-            "cover_xpath", "thumb_xpath", "title_xpath", "description_xpath", "link_xpath",
-            "city_xpath", "country_xpath", "address_xpath", "lat_xpath", "lng_xpath",
-            "google_maps_uri_xpath", "start_date_xpath", "end_date_xpath", "dates_xpath",
-            "allDay_xpath", "timeFrom_xpath", "timeTill_xpath"
         ]
 
     def save(self, dto: PageSettingsDTO):
@@ -31,23 +27,6 @@ class PageSettingsRepository:
                 "page_name": dto.page_name,
                 "event_list_re": dto.event_list_re,
                 "event_container_xpath": dto.event_container_xpath,
-                "cover_xpath": dto.cover_xpath,
-                "thumb_xpath": dto.thumb_xpath,
-                "title_xpath": dto.title_xpath,
-                "description_xpath": dto.description_xpath,
-                "link_xpath": dto.link_xpath,
-                "city_xpath": dto.city_xpath,
-                "country_xpath": dto.country_xpath,
-                "address_xpath": dto.address_xpath,
-                "lat_xpath": dto.lat_xpath,
-                "lng_xpath": dto.lng_xpath,
-                "google_maps_uri_xpath": dto.google_maps_uri_xpath,
-                "start_date_xpath": dto.start_date_xpath,
-                "end_date_xpath": dto.end_date_xpath,
-                "dates_xpath": dto.dates_xpath,
-                "allDay_xpath": dto.allDay_xpath,
-                "timeFrom_xpath": dto.timeFrom_xpath,
-                "timeTill_xpath": dto.timeTill_xpath,
             })
 
     def get_by_page_name(self, page_name):
@@ -62,23 +41,6 @@ class PageSettingsRepository:
                     dto.page_name = row["page_name"]
                     dto.event_list_re = row["event_list_re"]
                     dto.event_container_xpath = row["event_container_xpath"]
-                    dto.cover_xpath = row["cover_xpath"]
-                    dto.thumb_xpath = row["thumb_xpath"]
-                    dto.title_xpath = row["title_xpath"]
-                    dto.description_xpath = row["description_xpath"]
-                    dto.link_xpath = row["link_xpath"]
-                    dto.city_xpath = row["city_xpath"]
-                    dto.country_xpath = row["country_xpath"]
-                    dto.address_xpath = row["address_xpath"]
-                    dto.lat_xpath = row["lat_xpath"]
-                    dto.lng_xpath = row["lng_xpath"]
-                    dto.google_maps_uri_xpath = row["google_maps_uri_xpath"]
-                    dto.start_date_xpath = row["start_date_xpath"]
-                    dto.end_date_xpath = row["end_date_xpath"]
-                    dto.dates_xpath = row["dates_xpath"]
-                    dto.allDay_xpath = row["allDay_xpath"]
-                    dto.timeFrom_xpath = row["timeFrom_xpath"]
-                    dto.timeTill_xpath = row["timeTill_xpath"]
                     return dto
         return None
 
@@ -94,23 +56,6 @@ class PageSettingsRepository:
                         "page_name": dto.page_name,
                         "event_list_re": dto.event_list_re,
                         "event_container_xpath": dto.event_container_xpath,
-                        "cover_xpath": dto.cover_xpath,
-                        "thumb_xpath": dto.thumb_xpath,
-                        "title_xpath": dto.title_xpath,
-                        "description_xpath": dto.description_xpath,
-                        "link_xpath": dto.link_xpath,
-                        "city_xpath": dto.city_xpath,
-                        "country_xpath": dto.country_xpath,
-                        "address_xpath": dto.address_xpath,
-                        "lat_xpath": dto.lat_xpath,
-                        "lng_xpath": dto.lng_xpath,
-                        "google_maps_uri_xpath": dto.google_maps_uri_xpath,
-                        "start_date_xpath": dto.start_date_xpath,
-                        "end_date_xpath": dto.end_date_xpath,
-                        "dates_xpath": dto.dates_xpath,
-                        "allDay_xpath": dto.allDay_xpath,
-                        "timeFrom_xpath": dto.timeFrom_xpath,
-                        "timeTill_xpath": dto.timeTill_xpath,
                     }
                 rows.append(row)
 

@@ -9,6 +9,7 @@ from event.service import event_service
 from page_settings.service import page_settings_service
 from ai_crawler import settings
 from ai_crawler.spider_utils import load_page_content, extract_links_from_element, safe_extract
+from ai.ai_service import openai_service
 
 
 class ArtbaselSpider(Spider):
@@ -33,8 +34,10 @@ class ArtbaselSpider(Spider):
         base_url = get_base_url(response)
         links = extract_links_from_element(html_content, base_url=base_url)
         filter_re = re.compile(page_settings.event_list_re)
-        event_links = [link for link in links if filter_re.match(link) and link != response.url]
-        for link in event_links[:1]:
+        event_links = {link for link in links if filter_re.match(link) and link != response.url}
+        print(f"Event links: {event_links} from re: {page_settings.event_list_re}")
+        print(f"Event links count: {len(event_links)}")
+        for link in event_links:
             yield response.follow(
                 link,
                 callback=self.parse_event_page,
@@ -43,31 +46,20 @@ class ArtbaselSpider(Spider):
 
     async def parse_event_page(self, response):
         # This method will be implemented in the next step
-        page_settings = page_settings_service.get_page_settings_by_name(self.name)
-        content = await load_page_content(response)
-        html_content = html.fromstring(content)
-        container_html = html_content.xpath(page_settings.event_container_xpath)[0]
-        print(f"Container HTML: {etree.tostring(container_html, pretty_print=True).decode('utf-8')}")
-        event_link = response.url
-        event_title = safe_extract(container_html, page_settings.title_xpath, default="No title found")
-        event_description = safe_extract(container_html, page_settings.description_xpath, default="No description found")
-        event_image = safe_extract(container_html, page_settings.cover_xpath, default="No image found")
-        event_google_maps_uri = safe_extract(container_html, page_settings.google_maps_uri_xpath, default="No Google Maps URI found")
-        event_city = safe_extract(container_html, page_settings.city_xpath, default="No city found")
-        event_country = safe_extract(container_html, page_settings.country_xpath, default="No country found")
-        event_address = safe_extract(container_html, page_settings.address_xpath, default="No address found")
-        event_start_date = safe_extract(container_html, page_settings.start_date_xpath, default="No start date found")
-        event_end_date = safe_extract(container_html, page_settings.end_date_xpath, default="No end date found")
+        try:
+            page_settings = page_settings_service.get_page_settings_by_name(self.name)
+            content = await load_page_content(response)
+            html_content = html.fromstring(content)
+            container_html = html_content.xpath(page_settings.event_container_xpath)[0]
+            str_html = etree.tostring(container_html, pretty_print=True).decode("utf-8")
+            event_data = openai_service.get_event_json(str_html)
 
-        event_service.create_event(
-            title=event_title,
-            description=event_description,
-            link=event_link,
-            city=event_city,
-            country=event_country,
-            address=event_address,
-            google_maps_uri=event_google_maps_uri,
-            start_date=event_start_date,
-            end_date=event_end_date,
-            cover=event_image,
-        )
+            event_dto = event_service.from_dict(event_data)
+            event_dto.original_uri = response.url
+            event_dto.original_site = self.name
+            event_service.save_event(event_dto)
+        except Exception as e:
+            print(f"Error parsing event page: {e}")
+            print(f"Response URL: {response.url}")
+            if event_data:
+                print(f"Event data: {event_data}")

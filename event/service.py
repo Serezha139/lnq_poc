@@ -1,5 +1,5 @@
 from event.dto import EventDTO
-from event.repo import EventCSVRepo
+from event.repo import EventCSVRepo, EventJsonRepo
 from ai_crawler.settings import EVENT_CSV_REPO_FILE, EVENT_TXT_REPO_FILE
 
 
@@ -35,5 +35,25 @@ class EventService:
         )
         self.event_repository.save(event)
 
+    def from_dict(self, dict):
+        # Convert a dictionary to an EventDTO
+        edto = EventDTO(
+            title=dict.get('title'),
+            description=dict.get('description'),
+            link=dict.get('link'),
+            city=dict.get('city'),
+            country=dict.get('country'),
+            address=dict.get('address'),
+            google_maps_uri=dict.get('google_maps_uri'),
+            start_datetime=dict.get('start_datetime'),
+            end_datetime=dict.get('end_datetime'),
+            cover=dict.get('cover')
+        )
+        return edto
 
-event_service = EventService(event_repository=EventCSVRepo(EVENT_CSV_REPO_FILE))  # Replace with actual repository instance
+    def save_event(self, event_dto):
+        # Save the event to the repository
+        self.event_repository.save(event_dto)
+
+
+event_service = EventService(event_repository=EventJsonRepo(EVENT_CSV_REPO_FILE))  # Replace with actual repository instance

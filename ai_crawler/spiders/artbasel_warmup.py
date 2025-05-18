@@ -65,13 +65,7 @@ class ArtBaselWarmupSpider(scrapy.Spider):
         print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Event page: {response.url}")
         page_settings = page_settings_service.get_page_settings_by_name(self.site_name)
         content = await load_page_content(response)
-        html_content = html.fromstring(content)
         # Dynamically determine the event_container_xpath
         xpath_event_container = openai_service.get_event_container_xpath_expression(content)
         page_settings.event_container_xpath = xpath_event_container
-        container_html = html_content.xpath(page_settings.event_container_xpath)[0]
-        print(f"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Container html: {container_html}")
-        for key, value in page_settings.gpt_request_field_mapping.items():
-            xpath = openai_service.get_event_xpath_expressions(container_html, key)
-            setattr(page_settings, value, xpath)
         page_settings_service.save_page_settings(page_settings)
